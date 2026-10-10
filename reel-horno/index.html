@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Dubrera Horno</title>
+<style>
+@font-face{font-family:Anton;src:url(assets/fonts/Anton.ttf)}
+@font-face{font-family:Cinzel;src:url(assets/fonts/Cinzel-Bold.ttf);font-weight:700}
+@font-face{font-family:Caveat;src:url(assets/fonts/Caveat-Bold.ttf);font-weight:700}
+@font-face{font-family:Poppins;src:url(assets/fonts/Poppins-SemiBold.ttf);font-weight:600}
+@font-face{font-family:Poppins;src:url(assets/fonts/Poppins-ExtraBold.ttf);font-weight:800}
+:root{--cream:#f7ecd3;--gold:#e0ad4c;--gold2:#f3d58e;--green:#3b473c;--ink:#22180f}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#120c08}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:Poppins,sans-serif;color:var(--cream)}
+#gl,#ov{position:absolute;inset:0}
+#gl canvas{display:block}
+.a{animation-fill-mode:both!important;animation-delay:calc(var(--s,0s) + var(--d,0s))!important;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+.scene{position:absolute;inset:0;visibility:hidden}
+.c{position:absolute;left:0;right:0;text-align:center}
+.hand{font-family:Caveat;font-weight:700}
+.sh{text-shadow:0 4px 18px rgba(0,0,0,.65),0 2px 0 rgba(0,0,0,.4)}
+
+@keyframes popIn{0%{transform:scale(0) rotate(-20deg);opacity:0}55%{transform:scale(1.12) rotate(4deg);opacity:1}78%{transform:scale(.96)}100%{transform:none}}
+@keyframes slam{0%{transform:scale(2.6);opacity:0}55%{transform:scale(.94);opacity:1}100%{transform:none}}
+@keyframes up{0%{transform:translateY(70px);opacity:0}100%{transform:none;opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes inL{0%{transform:translateX(-900px)}70%{transform:translateX(24px)}100%{transform:none}}
+@keyframes inR{0%{transform:translateX(900px)}70%{transform:translateX(-24px)}100%{transform:none}}
+@keyframes stamp{0%{transform:scale(2.4) rotate(-35deg);opacity:0}60%{transform:scale(.9) rotate(-6deg);opacity:1}80%{transform:scale(1.05) rotate(-10deg)}100%{transform:rotate(-8deg)}}
+@keyframes ding{0%{transform:scale(0) rotate(-30deg);opacity:0}30%{transform:scale(1.25) rotate(8deg);opacity:1}45%{transform:scale(.95) rotate(-4deg)}60%,85%{transform:scale(1) rotate(-6deg);opacity:1}100%{transform:scale(1.4);opacity:0}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes flash{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+@keyframes shine{from{transform:translateX(-600px) rotate(25deg)}to{transform:translateX(600px) rotate(25deg)}}
+@keyframes typing{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+
+/* readability gradients */
+.gradB{position:absolute;left:0;right:0;bottom:0;height:900px;background:linear-gradient(transparent,rgba(14,8,4,.55) 35%,rgba(14,8,4,.88))}
+.gradT{position:absolute;left:0;right:0;top:0;height:520px;background:linear-gradient(rgba(14,8,4,.75),transparent)}
+
+.ding{position:absolute;left:640px;top:520px;width:380px;height:380px;display:flex;align-items:center;justify-content:center;
+  font-family:Anton;font-size:120px;color:#3a1d06;background:var(--gold2);
+  clip-path:polygon(50% 0,61% 22%,85% 10%,79% 36%,100% 46%,79% 58%,90% 84%,63% 76%,50% 100%,38% 76%,11% 86%,21% 59%,0 47%,21% 36%,13% 11%,38% 22%)}
+.ribbon{display:inline-block;background:linear-gradient(90deg,#b98a34,var(--gold2),#b98a34);color:var(--ink);font-family:Anton;font-size:74px;padding:10px 46px 14px;letter-spacing:3px;
+  box-shadow:0 10px 0 #6b4a17;transform:rotate(-2deg)}
+.logo{position:absolute;filter:drop-shadow(0 20px 40px rgba(0,0,0,.6))}
+.logo .mask{position:absolute;inset:0;border-radius:50%;overflow:hidden}
+.logo .mask i{position:absolute;top:-200px;left:50%;width:120px;height:1000px;margin-left:-60px;background:linear-gradient(90deg,transparent,rgba(255,240,200,.6),transparent)}
+
+.tag{display:inline-block;border:3px solid var(--gold2);color:var(--gold2);font-weight:800;font-size:36px;padding:8px 30px;border-radius:50px;letter-spacing:3px;background:rgba(20,12,6,.5)}
+.title{font-family:Anton;font-size:128px;line-height:1;letter-spacing:1px;color:var(--cream)}
+.desc{font-family:Caveat;font-weight:700;font-size:60px;color:var(--gold2)}
+.price{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe7a6,#e0ad4c 55%,#a8761f);
+  color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 14px 30px rgba(0,0,0,.5),inset 0 0 0 10px rgba(255,255,255,.18)}
+.price b{font-family:Anton;font-weight:400;font-size:86px;line-height:1}
+.price small{font-weight:800;font-size:28px;letter-spacing:2px}
+.duo{position:absolute;left:50px;right:50px;display:flex;gap:30px}
+.duo>div{flex:1;background:rgba(20,12,6,.7);border:2px solid rgba(243,213,142,.5);border-radius:34px;padding:26px 20px;text-align:center;backdrop-filter:blur(4px)}
+.duo h3{font-family:Anton;font-weight:400;font-size:62px;line-height:1.02;color:var(--cream)}
+.duo p{font-family:Caveat;font-weight:700;font-size:42px;color:var(--gold2);line-height:1.05;margin:6px 0 10px}
+.duo b{display:inline-block;font-family:Anton;font-weight:400;font-size:70px;color:var(--ink);background:var(--gold);padding:2px 26px 6px;border-radius:18px}
+.badge{position:absolute;background:#c8643b;color:#fff;border-radius:26px;padding:16px 30px;font-weight:800;font-size:36px;line-height:1.1;text-align:center;box-shadow:0 10px 24px rgba(0,0,0,.45)}
+.badge b{display:block;font-family:Anton;font-weight:400;font-size:66px}
+
+.pill{display:inline-flex;align-items:center;gap:22px;background:rgba(247,236,211,.95);color:var(--green);font-weight:800;font-size:44px;border-radius:60px;padding:14px 40px 14px 22px;margin:10px 0}
+.pill img{width:70px;height:70px}
+.btn{display:inline-flex;align-items:center;gap:26px;border-radius:120px;padding:26px 56px;color:#fff;font-weight:800}
+.wa{background:#25D366;box-shadow:0 14px 0 #128C4B;font-size:70px}
+.ig{background:linear-gradient(45deg,#f9a03f,#e1306c 50%,#833ab4);box-shadow:0 14px 0 #5e2380;font-size:60px}
+.igicon{width:78px;height:78px;border:8px solid #fff;border-radius:24px;position:relative;flex:none}
+.igicon:before{content:"";position:absolute;inset:13px;border:8px solid #fff;border-radius:50%}
+.igicon:after{content:"";position:absolute;right:6px;top:6px;width:9px;height:9px;background:#fff;border-radius:50%}
+.flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(255,214,150,.55),rgba(255,150,60,.22) 45%,transparent 75%);mix-blend-mode:screen}
+.vign{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(0,0,0,.55));pointer-events:none}
+</style>
+</head>
+<body>
+<div id="stage"><div id="gl"></div><div id="ov"></div></div>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import { T } from './src/timeline.js';
+const E = n => `assets/emoji/${n}.svg`;
+const LOGO = (size) => `
+<svg width="${size}" height="${size}" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="lg${size}" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#627361"/><stop offset="1" stop-color="#36423a"/></radialGradient>
+    <linearGradient id="gd${size}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1dca0"/><stop offset=".5" stop-color="#b89a55"/><stop offset="1" stop-color="#e8cf8a"/></linearGradient>
+    <clipPath id="cc${size}"><circle cx="300" cy="300" r="262"/></clipPath>
+  </defs>
+  <circle cx="300" cy="300" r="296" fill="#2a332b"/><circle cx="300" cy="300" r="286" fill="url(#lg${size})"/>
+  <circle cx="300" cy="300" r="272" fill="none" stroke="url(#gd${size})" stroke-width="7"/>
+  <circle cx="300" cy="300" r="258" fill="none" stroke="#e9dcb4" stroke-width="2" opacity=".8"/>
+  <g fill="none" stroke="#e7d39b" stroke-width="5"><ellipse cx="300" cy="150" rx="78" ry="38"/><ellipse cx="270" cy="150" rx="24" ry="30"/><ellipse cx="300" cy="150" rx="24" ry="32"/><ellipse cx="330" cy="150" rx="24" ry="30"/></g>
+  <line x1="200" y1="205" x2="400" y2="205" stroke="#e7d39b" stroke-width="3"/>
+  <g clip-path="url(#cc${size})" stroke="#e9dcb4"><line x1="0" y1="232" x2="600" y2="232" stroke-width="3"/><line x1="0" y1="242" x2="600" y2="242" stroke-width="1.5"/><line x1="0" y1="352" x2="600" y2="352" stroke-width="1.5"/><line x1="0" y1="362" x2="600" y2="362" stroke-width="3"/></g>
+  <rect x="140" y="345" width="320" height="4" fill="#7fa3b5" opacity=".7"/>
+  <text x="300" y="330" text-anchor="middle" font-family="Cinzel" font-weight="700" font-size="92" fill="#f3e5bf" letter-spacing="2">DUBRERA</text>
+  <circle cx="42" cy="296" r="9" fill="#9dc0cf"/><circle cx="558" cy="296" r="9" fill="#9dc0cf"/>
+  <text x="300" y="418" text-anchor="middle" font-family="Cinzel" font-weight="700" font-size="29" fill="#f3e5bf" letter-spacing="2">PANADERÍA ARTESANAL</text>
+  <path d="M120 480 Q300 560 480 480" fill="none" stroke="#e9dcb4" stroke-width="2" opacity=".6"/>
+</svg>`;
+
+const scenes = [];
+const add = (start, end, html) => scenes.push({ start, end, html });
+const S0 = T.swaps;
+
+// intro: oven heating up
+add(0, T.open + 0.3, `
+  <div class="gradT"></div>
+  <div class="c hand sh a" style="top:70px;font-size:96px;color:var(--gold2);animation-name:typing;animation-duration:1.3s;animation-timing-function:steps(28);--d:.3s">shhh… algo se está horneando</div>
+  <div class="c a" style="top:185px;font-family:Anton;font-size:52px;letter-spacing:5px;color:rgba(247,236,211,.85);animation-name:up;animation-duration:.6s;--d:1.3s"><img src="assets/emoji/1f525.svg" style="width:56px;vertical-align:-6px"> MENÚ DE SEPTIEMBRE <img src="assets/emoji/1f525.svg" style="width:56px;vertical-align:-6px"></div>
+  <div class="ding a" style="animation-name:ding;animation-duration:.9s;--d:${T.open - 0.75}s">¡DING!</div>`);
+
+// door opens: flash + logo
+add(T.open, S0[0], `
+  <div class="flash a" style="animation-name:flash;animation-duration:1.1s;--d:.2s"></div>
+  <div class="a" style="position:absolute;inset:0;animation-name:fadeOut;animation-duration:.4s;--d:${5.9 - T.open}s">
+  <div class="gradT a" style="animation-name:fadeIn;animation-duration:.6s;--d:1.4s"></div>
+  <div class="logo a" style="left:330px;top:120px;width:420px;height:420px;animation-name:popIn;animation-duration:.75s;--d:1.35s">${LOGO(420)}
+    <div class="mask"><i class="a" style="animation-name:shine;animation-duration:.9s;--d:2.1s"></i></div></div>
+  <div class="c a" style="top:570px;animation-name:inR;animation-duration:.6s;--d:1.75s"><span class="ribbon">RECIÉN SALIDO DEL HORNO</span></div>
+  </div>
+  <div class="a" style="position:absolute;inset:0;animation-name:fadeOut;animation-duration:.4s;--d:${S0[0] - T.open - 0.4}s">
+    <div class="gradB a" style="animation-name:fadeIn;animation-duration:.5s;--d:${6.0 - T.open}s"></div>
+    <div class="c a" style="top:1180px;animation-name:up;animation-duration:.45s;--d:${6.1 - T.open}s"><span class="tag">x 12 · DE MANTECA</span></div>
+    <div class="c title sh a" style="top:1265px;animation-name:up;animation-duration:.5s;--d:${6.2 - T.open}s">MEDIALUNAS</div>
+    <div class="c desc sh a" style="top:1400px;animation-name:up;animation-duration:.5s;--d:${6.4 - T.open}s">simple · dulce de leche · crema pastelera</div>
+    <div class="price a" style="left:730px;top:900px;animation-name:stamp;animation-duration:.55s;--d:${6.65 - T.open}s"><small>x 12</small><b>$20.000</b></div>
+  </div>`);
+
+const product = (i, html) => add(S0[i], S0[i + 1] ?? T.cta, `
+  <div class="gradB"></div>${html}`);
+const rel = (i, x) => x; // delays are already relative to scene start
+
+product(0, `
+  <div class="c a" style="top:1060px;animation-name:up;animation-duration:.45s;--d:.6s"><span class="tag">MASA MADRE · 900g</span></div>
+  <div class="c title sh a" style="top:1140px;font-size:110px;animation-name:up;animation-duration:.5s;--d:.7s">PANES DE MASA MADRE</div>
+  <div class="duo" style="top:1300px">
+    <div class="a" style="animation-name:inL;animation-duration:.55s;--d:.9s"><h3>PAN DE CAMPO</h3><p>trigo, centeno y espelta orgánicos</p><b>$6.500</b></div>
+    <div class="a" style="animation-name:inR;animation-duration:.55s;--d:1.05s"><h3>PAN DE OLIVAS</h3><p>aceitunas verdes y negras</p><b>$7.500</b></div>
+  </div>`);
+product(1, `
+  <div class="c a" style="top:1060px;animation-name:up;animation-duration:.45s;--d:.6s"><span class="tag">HARINA ORGÁNICA · 900g</span></div>
+  <div class="c title sh a" style="top:1140px;animation-name:up;animation-duration:.5s;--d:.7s">FOCACCIAS</div>
+  <div class="duo" style="top:1290px">
+    <div class="a" style="animation-name:inL;animation-duration:.55s;--d:.9s"><h3>ROMERO &amp; CHERRYS</h3><p>aceite de oliva y sal</p><b>$22.000</b></div>
+    <div class="a" style="animation-name:inR;animation-duration:.55s;--d:1.05s"><h3>OLIVAS VERDES</h3><p>aceite de oliva y sal</p><b>$22.000</b></div>
+  </div>
+  <div class="badge a" style="left:620px;top:860px;animation-name:stamp;animation-duration:.55s;--d:1.5s">¿solo un antojito?<b>PORCIÓN $4.000</b></div>`);
+product(2, `
+  <div class="c a" style="top:1180px;animation-name:up;animation-duration:.45s;--d:.6s"><span class="tag">x 1 KG</span></div>
+  <div class="c title sh a" style="top:1265px;animation-name:up;animation-duration:.5s;--d:.7s">CHIPÁ</div>
+  <div class="c desc sh a" style="top:1400px;animation-name:up;animation-duration:.5s;--d:.9s">parmesano, sardo y cremoso</div>
+  <div class="price a" style="left:730px;top:900px;animation-name:stamp;animation-duration:.55s;--d:1.1s"><small>x KG</small><b>$18.000</b></div>
+  <div class="badge a" style="left:50px;top:960px;animation-name:inL;animation-duration:.55s;--d:1.4s">congelado x kg<b>$16.000</b></div>`);
+product(3, `
+  <div class="c a" style="top:1180px;animation-name:up;animation-duration:.45s;--d:.6s"><span class="tag">160g · CON PARMESANO</span></div>
+  <div class="c title sh a" style="top:1265px;animation-name:up;animation-duration:.5s;--d:.7s">SCON DE QUESO</div>
+  <div class="c desc sh a" style="top:1400px;animation-name:up;animation-duration:.5s;--d:.9s">crocante afuera, tierno adentro</div>
+  <div class="price a" style="left:730px;top:900px;animation-name:stamp;animation-duration:.55s;--d:1.1s"><small>C/U</small><b>$4.000</b></div>`);
+// mix tray arrives, then CTA
+add(S0[4], T.end + 1, `
+  <div class="a" style="position:absolute;inset:0;background:rgba(14,8,4,.62);animation-name:fadeIn;animation-duration:.8s;--d:${T.cta - S0[4]}s"></div>
+  <div class="logo a" style="left:370px;top:150px;width:340px;height:340px;animation-name:popIn;animation-duration:.7s;--d:${T.cta - S0[4] + 0.1}s">${LOGO(340)}</div>
+  <div class="c title sh a" style="top:520px;font-size:112px;line-height:1.02;animation-name:slam;animation-duration:.45s;--d:${T.cta - S0[4] + 0.35}s">¿SE TE HIZO<br>AGUA LA BOCA?</div>
+  <div class="c" style="top:780px">
+    <div class="a" style="animation-name:inL;animation-duration:.5s;--d:${T.cta - S0[4] + 0.75}s"><span class="pill"><img src="${E('1f4c5')}">Pedidos con 48hs</span></div>
+    <div class="a" style="animation-name:inR;animation-duration:.5s;--d:${T.cta - S0[4] + 0.9}s"><span class="pill"><img src="${E('1f6f5')}">Envíos en CABA</span></div>
+    <div class="a" style="animation-name:inL;animation-duration:.5s;--d:${T.cta - S0[4] + 1.05}s"><span class="pill"><img src="${E('1f4cd')}">Retiro zona Congreso</span></div>
+  </div>
+  <div class="c a" style="top:1130px;animation-name:popIn;animation-duration:.5s;--d:${T.cta - S0[4] + 1.4}s">
+    <div style="display:inline-block;animation:pulse .8s ease-in-out infinite both">
+      <div class="btn wa"><svg width="88" height="88" viewBox="0 0 32 32"><path fill="#fff" d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.8 2 6.8L3 29l6.6-2c1.9 1 4.1 1.6 6.4 1.6 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.3c-2.1 0-4.1-.6-5.8-1.7l-.4-.3-3.9 1.2 1.2-3.8-.3-.4c-1.2-1.800-1.900-3.900-1.900-6.100C4.900 9.800 9.900 4.900 16 4.900s11.100 4.900 11.100 11-5 10.400-11.100 10.400zm6.1-7.8c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.7-1.7-1-.9-1.7-2-1.9-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.5c-.3-.7-.6-.6-.7-.6h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.5c.2.2 2.4 3.6 5.8 5 2.9 1.1 3.4.9 4.1.9.6-.1 2-.8 2.300-1.600.3-.8.3-1.4.2-1.6-.1-.1-.3-.2-.6-.3z"/></svg><span>11 7644-2129</span></div>
+    </div></div>
+  <div class="c a" style="top:1330px;animation-name:popIn;animation-duration:.5s;--d:${T.cta - S0[4] + 1.65}s"><div class="btn ig"><span class="igicon"></span><span>@dubrerapan</span></div></div>
+  <div class="c hand sh a" style="top:1500px;font-size:72px;color:var(--gold2);animation-name:up;animation-duration:.5s;--d:${T.cta - S0[4] + 2.0}s">¡pedí el tuyo y compartilo!</div>`);
+
+const ov = document.getElementById('ov');
+for (const s of scenes) {
+  const el = document.createElement('div'); el.className = 'scene';
+  el.style.setProperty('--s', s.start + 's'); el.dataset.start = s.start; el.dataset.end = s.end;
+  el.innerHTML = s.html; ov.appendChild(el);
+}
+// soft warm flash on every tray swap (heat from the oven)
+for (const sw of S0) {
+  const f = document.createElement('div'); f.className = 'flash a';
+  f.style.cssText = `--s:${sw}s;animation-name:flash;animation-duration:.7s;opacity:0`; ov.appendChild(f);
+}
+const vg = document.createElement('div'); vg.className = 'vign'; ov.appendChild(vg);
+
+await Promise.all(['700 40px Cinzel', '40px Anton', '700 40px Caveat', '800 40px Poppins', '600 40px Poppins'].map(f => document.fonts.load(f)));
+const { seek } = await import('./src/scene.js');
+window.TOTAL = T.end;
+window.seek = (t) => {
+  for (const el of ov.querySelectorAll('.scene')) el.style.visibility = (t >= +el.dataset.start && t < +el.dataset.end) ? 'visible' : 'hidden';
+  document.getAnimations().forEach(a => { a.pause(); a.currentTime = t * 1000; });
+  seek(t);
+};
+await Promise.all([...document.images].map(i => i.complete ? 1 : new Promise(r => { i.onload = i.onerror = r; })));
+window.seek(0);
+window.done = true;
+if (!location.hash.includes('render')) { const t0 = performance.now(); const loop = () => { window.seek(((performance.now() - t0) / 1000) % T.end); requestAnimationFrame(loop); }; loop(); }
+</script>
+</body>
+</html>
