@@ -32,15 +32,11 @@
     const aL = o.armL ?? 0.3, aR = o.armR ?? 0.3;
     G.line(ctx, [[-70, -95], [-70 - Math.cos(aL) * 46, -95 - Math.sin(aL) * 46]], { color: C.ink, lw: 7, seed: 7 });
     G.line(ctx, [[70, -95], [70 + Math.cos(aR) * 46, -95 - Math.sin(aR) * 46]], { color: C.ink, lw: 7, seed: 8 });
-    // crescent of rolled segments, tips first so the centre sits on top
-    for (const i of [-2, 2, -1, 1, 0]) {
-      const a = Math.abs(i);
-      const cx = i * 44, cy = -92 + a * a * 9, rx = 44 - a * 9, ry = 54 - a * 12;
-      ctx.save(); ctx.translate(cx, cy); ctx.rotate(i * 0.28);
-      G.ellipse(ctx, 0, 0, rx, ry, { fill: a === 2 ? C.crust2 : a === 1 ? '#c7782a' : C.crust, lw: 5, stroke: '#5e3412', seed: 20 + i, hatch: { color: 'rgba(90,45,10,0.18)', gap: 9 } });
-      G.line(ctx, [[-rx * 0.5, -ry * 0.55], [rx * 0.1, -ry * 0.75]], { color: 'rgba(255,230,170,0.7)', lw: 5, seed: 30 + i });
-      ctx.restore();
-    }
+    // chipá body: a lumpy golden cheese ball
+    for (let k = 0; k < 11; k++) { const ang = k / 11 * Math.PI * 2 + 0.3, r = 74 + 6 * Math.sin(k * 2.3); G.ellipse(ctx, Math.cos(ang) * r, -95 + Math.sin(ang) * r * 0.9, 20, 18, { fill: '#e2a849', stroke: '#6e4316', lw: 4, seed: 20 + k }); }
+    G.ellipse(ctx, 0, -95, 80, 72, { fill: '#e9b85a', stroke: '#6e4316', lw: 5, seed: 19, hatch: { color: 'rgba(120,70,15,0.16)', gap: 10 } });
+    for (let k = 0; k < 9; k++) { const sx = (U.hash(k, 7) - 0.5) * 120, sy = -95 + (U.hash(k, 8) - 0.5) * 100; if (Math.hypot(sx, (sy + 95) * 1.1) < 70 && Math.abs(sy + 108) > 22) G.ellipse(ctx, sx, sy, 7, 5, { fill: 'rgba(160,90,25,0.55)', lw: 0, seed: 50 + k }); }
+    G.line(ctx, [[-50, -140], [-15, -158]], { color: 'rgba(255,240,190,0.75)', lw: 6, seed: 33 });
     // face
     const e = o.eyes || 'normal';
     for (const d of [-1, 1]) {
@@ -57,6 +53,10 @@
     for (const i of [-2, 2, -1, 1, 0]) { const a = Math.abs(i); G.ellipse(ctx, i * 12, a * a * 3, 13 - a * 2.5, 16 - a * 3.5, { fill: a === 2 ? C.crust2 : C.crust, lw: 3, stroke: '#5e3412', seed: 60 + i }); }
     ctx.restore();
   }
+  function miniChipa(ctx, x, y, s) {
+    G.ellipse(ctx, x, y, 15 * s, 13 * s, { fill: '#e9b85a', stroke: '#6e4316', lw: 3, seed: 66 });
+    G.ellipse(ctx, x - 4 * s, y - 4 * s, 4 * s, 3 * s, { fill: 'rgba(255,240,190,0.8)', lw: 0, seed: 67 });
+  }
   function cart(ctx, x, y, s, wheel, t) {
     ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
     // poles + striped awning
@@ -68,7 +68,7 @@
     G.rrect(ctx, -240, -500, 480, 40, 14, { fill: C.green, lw: 5, seed: 80 });
     G.text(ctx, 'DUBRERA', 0, -468, { size: 34, fam: 'Cinzel', weight: 700, color: C.gold2, align: 'center' });
     // basket of croissants on the counter
-    for (let k = 0; k < 7; k++) miniCroissant(ctx, -150 + k * 50, -168 - (k % 2) * 16, 1.4, (k % 3 - 1) * 0.25);
+    for (let k = 0; k < 7; k++) { if (k % 2) miniChipa(ctx, -150 + k * 50, -172, 1.5); else miniCroissant(ctx, -150 + k * 50, -168, 1.4, (k % 3 - 1) * 0.25); }
     // body
     G.rrect(ctx, -230, -160, 460, 150, 18, { fill: '#c99a5b', lw: 6, seed: 81, hatch: { color: 'rgba(90,50,20,0.2)', gap: 12, angle: 1.57 } });
     G.rrect(ctx, -150, -135, 300, 90, 12, { fill: C.cream, lw: 5, seed: 82 });
@@ -87,18 +87,12 @@
     G.ellipse(ctx, x - 50 * s, y - 130 * s, 60 * s, 50 * s, { fill: '#5aab4d', lw: 5, seed: seed + 2 });
     G.ellipse(ctx, x + 55 * s, y - 135 * s, 58 * s, 50 * s, { fill: '#5aab4d', lw: 5, seed: seed + 3 });
   }
+  let LOGO = null; // the real Dubrera logo (assets/logo.png, cut from the catalogue)
   function logo(ctx, x, y, r, t, t0) {
-    const p = pop(t, t0, 0.5); if (p <= 0) return;
+    const p = pop(t, t0, 0.5); if (p <= 0 || !LOGO) return;
     ctx.save(); ctx.translate(x, y); ctx.scale(p, p); ctx.rotate((1 - p) * -0.6);
-    G.ellipse(ctx, 0, 0, r, r, { fill: '#2a332b', lw: 0, seed: 90 });
-    G.ellipse(ctx, 0, 0, r * 0.96, r * 0.96, { fill: C.green2, lw: 0, seed: 91 });
-    G.ellipse(ctx, 0, 0, r * 0.91, r * 0.91, { fill: 'none', stroke: '#d8bf7a', lw: r * 0.025, seed: 92 });
-    ctx.strokeStyle = '#e7d39b'; ctx.lineWidth = r * 0.016;
-    for (const dx of [-0.1, 0, 0.1]) { ctx.beginPath(); ctx.ellipse(dx * r, -r * 0.5, r * 0.08, r * 0.1, 0, 0, 7); ctx.stroke(); }
-    ctx.beginPath(); ctx.ellipse(0, -r * 0.5, r * 0.26, r * 0.13, 0, 0, 7); ctx.stroke();
-    for (const yy of [-0.23, 0.2]) { ctx.beginPath(); ctx.moveTo(-r * 0.86, yy * r); ctx.lineTo(r * 0.86, yy * r); ctx.stroke(); }
-    G.text(ctx, 'DUBRERA', 0, r * 0.1, { size: r * 0.31, fam: 'Cinzel', weight: 700, color: '#f3e5bf', align: 'center', boil: 0 });
-    G.text(ctx, 'PANADERÍA ARTESANAL', 0, r * 0.4, { size: r * 0.098, fam: 'Cinzel', weight: 700, color: '#f3e5bf', align: 'center', boil: 0 });
+    ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 12;
+    ctx.drawImage(LOGO, -r, -r, r * 2, r * 2);
     ctx.restore();
   }
 
@@ -149,7 +143,7 @@
     croissantGuy(ctx, x + 40 + settle * 10, GY + 150 - 1.25 * 500 - bump - (st ? hop(t, 40) : 0), 1.05, { eyes: st ? 'happy' : 'wide', mouth: 'open', armL: st ? 1.4 + 0.5 * Math.sin(t * 12) : 0.6, armR: st ? 0.3 : 0.6, rot: settle * 0.15 });
     if (t >= ev.cartStop) { const p = pop(t, ev.cartStop, 0.35); G.rays(ctx, x, GY - 180, { n: 12, r0: 330, r1: 420, color: `rgba(255,255,255,${0.8 * (1 - clamp((t - ev.cartStop) / 0.5))})`, lw: 8 }); }
     stamp(ctx, 'NOS VAMOS', CX, SF.y + 140, t, ev.cartIn + BEAT, { size: 140, color: '#fff', rot: -0.05 });
-    stamp(ctx, 'DE PASEO', CX, SF.y + 290, t, ev.cartIn + BEAT * 2, { size: 140, color: C.gold2, rot: 0.04 });
+    stamp(ctx, 'A LA FERIA', CX, SF.y + 290, t, ev.cartIn + BEAT * 2, { size: 140, color: C.gold2, rot: 0.04 });
   }
 
   function sceneParque(ctx, t) {
@@ -176,6 +170,13 @@
     }
     if (t >= ev.pin) G.rays(ctx, px - 60, py - 60, { n: 10, r0: 70, r1: 150, color: `rgba(200,100,59,${0.9 * (1 - clamp((t - ev.pin) / 0.45))})`, lw: 9 });
     croissantGuy(ctx, px + 150, py + 250 - hop(t, 35), 0.9, { eyes: 'happy', mouth: 'open', armL: 1.3, armR: 1.3 + 0.4 * Math.sin(t * 10) });
+    if (t >= ev.pin + BEAT) {
+      const p = pop(t, ev.pin + BEAT, 0.3);
+      ctx.save(); ctx.translate(CX, SF.y + 230); ctx.rotate(-0.02); ctx.scale(p, p);
+      G.rrect(ctx, -270, -48, 540, 96, 48, { fill: C.green, lw: 5, seed: 230 });
+      G.text(ctx, 'FERIA VALOR BA', 0, 24, { size: 64, fam: 'Anton', weight: 400, color: C.gold2, align: 'center' });
+      ctx.restore();
+    }
     stamp(ctx, 'PARQUE', CX, SF.y + 120, t, ev.parque, { size: 170, color: C.green, stroke: '#fff', rot: -0.04 });
     stamp(ctx, 'CENTENARIO', CX, H * 0.47 + R + 190, t, ev.centenario, { size: 150, color: C.terra, stroke: '#fff', rot: 0.03 });
   }
@@ -219,23 +220,25 @@
       const age = t - ev.drop - h2 * 1.4; if (age < 0) continue;
       const y = -100 + age * (500 + h3 * 400), x = 40 + h1 * (W - 80);
       if (y > H + 100) continue;
-      miniCroissant(ctx, x, y, 1.6 + h3 * 1.4, age * (h1 - 0.5) * 6);
+      if (k % 2) miniChipa(ctx, x, y, 1.8 + h3 * 1.4); else miniCroissant(ctx, x, y, 1.6 + h3 * 1.4, age * (h1 - 0.5) * 6);
     }
     // invitation card
     const p = pop(t, ev.drop, 0.4);
     ctx.save(); ctx.translate(CX, H * 0.42); ctx.scale(p, p); ctx.rotate(-0.025);
-    G.tornPaper(ctx, -400, -360, 800, 760, { fill: C.cream, seed: 400, shadow: true });
-    G.text(ctx, 'HOY · SÁBADO 17/10', 0, -250, { size: 70, fam: 'Anton', weight: 400, color: C.terra, align: 'center' });
-    G.text(ctx, 'PARQUE', 0, -110, { size: 150, fam: 'Anton', weight: 400, color: C.green, align: 'center' });
-    G.text(ctx, 'CENTENARIO', 0, 40, { size: 150, fam: 'Anton', weight: 400, color: C.green, align: 'center' });
-    G.rrect(ctx, -300, 90, 600, 150, 30, { fill: C.gold, lw: 6, seed: 401 });
-    G.text(ctx, 'DE 12 A 18 HS', 0, 200, { size: 100, fam: 'Anton', weight: 400, color: C.ink, align: 'center' });
-    G.text(ctx, '¡con medialunas recién hechas!', 0, 330, { size: 58, fam: 'Caveat', weight: 700, color: '#7a5a32', align: 'center' });
+    G.tornPaper(ctx, -400, -420, 800, 830, { fill: C.cream, seed: 400, shadow: true });
+    G.text(ctx, 'HOY · SÁBADO 17/10', 0, -320, { size: 62, fam: 'Anton', weight: 400, color: C.terra, align: 'center' });
+    G.rrect(ctx, -260, -285, 520, 92, 46, { fill: C.green, lw: 5, seed: 402 });
+    G.text(ctx, 'FERIA VALOR BA', 0, -217, { size: 62, fam: 'Anton', weight: 400, color: C.gold2, align: 'center' });
+    G.text(ctx, 'PARQUE', 0, -70, { size: 140, fam: 'Anton', weight: 400, color: C.green, align: 'center' });
+    G.text(ctx, 'CENTENARIO', 0, 70, { size: 140, fam: 'Anton', weight: 400, color: C.green, align: 'center' });
+    G.rrect(ctx, -300, 110, 600, 140, 30, { fill: C.gold, lw: 6, seed: 401 });
+    G.text(ctx, 'DE 12 A 18 HS', 0, 215, { size: 96, fam: 'Anton', weight: 400, color: C.ink, align: 'center' });
+    G.text(ctx, '¡con chipá y medialunas recién hechos!', 0, 335, { size: 50, fam: 'Caveat', weight: 700, color: '#7a5a32', align: 'center' });
     ctx.restore();
     // dancing croissant
     const b = clock.phase(t);
-    croissantGuy(ctx, CX - 270, H * 0.42 + 660 - hop(t, 70), 1.2, { eyes: 'happy', mouth: 'open', armL: 1.5 + 0.5 * Math.sin(t * 11), armR: 1.5 + 0.5 * Math.sin(t * 11 + 3), rot: Math.sin(t * Math.PI / BEAT) * 0.15, kick: Math.sin(t * 11) });
-    croissantGuy(ctx, CX + 270, H * 0.42 + 660 - hop(t + BEAT / 2, 70), 1.2, { eyes: 'happy', mouth: 'open', armL: 1.5 + 0.5 * Math.sin(t * 11 + 1), armR: 1.5 + 0.5 * Math.sin(t * 11 + 2), rot: -Math.sin(t * Math.PI / BEAT) * 0.15, kick: -Math.sin(t * 11) });
+    croissantGuy(ctx, CX - 270, H * 0.42 + 680 - hop(t, 70), 1.2, { eyes: 'happy', mouth: 'open', armL: 1.5 + 0.5 * Math.sin(t * 11), armR: 1.5 + 0.5 * Math.sin(t * 11 + 3), rot: Math.sin(t * Math.PI / BEAT) * 0.15, kick: Math.sin(t * 11) });
+    croissantGuy(ctx, CX + 270, H * 0.42 + 680 - hop(t + BEAT / 2, 70), 1.2, { eyes: 'happy', mouth: 'open', armL: 1.5 + 0.5 * Math.sin(t * 11 + 1), armR: 1.5 + 0.5 * Math.sin(t * 11 + 2), rot: -Math.sin(t * Math.PI / BEAT) * 0.15, kick: -Math.sin(t * 11) });
   }
 
   function sceneOutro(ctx, t) {
@@ -253,6 +256,7 @@
       G.text(ctx, '@dubrerapan', 0, 22, { size: 64, fam: 'Inter', weight: 800, color: '#fff', align: 'center', boil: 0 });
       ctx.restore();
     }
+    if (t >= ev.outro + BEAT * 3) G.text(ctx, 'Feria Valor BA · Parque Centenario', CX, SF.y + 770, { size: 52, fam: 'Caveat', weight: 700, color: C.green, align: 'center', alpha: clamp((t - ev.outro - BEAT * 3) / 0.4) });
   }
 
   const scenes = [
@@ -265,6 +269,7 @@
     async init() {
       await Studio.loadFont('Anton', 'assets/Anton.ttf', 400);
       await Studio.loadFont('Cinzel', 'assets/Cinzel-Bold.ttf', 700);
+      LOGO = await Studio.loadImage('assets/logo.png');
     },
     draw(ctx, t) {
       const sc = scenes.find(([a, b]) => t >= a && t < b);
